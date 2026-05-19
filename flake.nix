@@ -1,5 +1,5 @@
 {
-  description = "Flake to manage grub2 themes from vinceliuice";
+  description = "Flake to manage the Anto426 GRUB2 theme";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/master";
@@ -28,7 +28,7 @@
             "ultrawide2k" = "3440x1440";
           };
           grub2-theme = pkgs.stdenv.mkDerivation {
-            name = "grub2-theme";
+            name = "anto426-grub-theme";
             src = "${self}";
             buildInputs = [ pkgs.imagemagick ];
             installPhase = ''
@@ -90,9 +90,9 @@
                 '';
               };
               theme = mkOption {
-                default = "tela";
-                example = "tela";
-                type = types.enum [ "tela" "vimix" "stylish" "whitesur" ];
+                default = "anto426";
+                example = "anto426";
+                type = types.enum [ "anto426" "tela" "vimix" "stylish" "whitesur" ];
                 description = ''
                   The theme to use for grub2.
                 '';

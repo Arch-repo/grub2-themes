@@ -4,14 +4,14 @@
 set -o errexit
 
 readonly ROOT_UID=0
-readonly Project_Name="GRUB2::THEMES"
+readonly Project_Name="ANTO426::GRUB"
 readonly MAX_DELAY=20                               # max delay for user to enter root password
 tui_root_login=
 
 THEME_DIR="/usr/share/grub/themes"
 REO_DIR="$(cd $(dirname $0) && pwd)"
 
-THEME_VARIANTS=('tela' 'vimix' 'stylish' 'whitesur')
+THEME_VARIANTS=('anto426' 'tela' 'vimix' 'stylish' 'whitesur')
 ICON_VARIANTS=('color' 'white' 'whitesur')
 SCREEN_VARIANTS=('1080p' '2k' '4k' 'ultrawide' 'ultrawide2k')
 custom_resolution=""
@@ -63,11 +63,11 @@ cat << EOF
 Usage: $0 [OPTION]...
 
 OPTIONS:
-  -t, --theme                 theme variant(s)          [tela|vimix|stylish|whitesur]       (default is tela)
+  -t, --theme                 theme variant(s)          [anto426|tela|vimix|stylish|whitesur] (default is anto426)
   -i, --icon                  icon variant(s)           [color|white|whitesur]              (default is color)
   -s, --screen                screen display variant(s) [1080p|2k|4k|ultrawide|ultrawide2k] (default is 1080p)
   -c, --custom-resolution     set custom resolution     (e.g., 1600x900)                    (disabled in default)
-  -r, --remove                remove theme              [tela|vimix|stylish|whitesur]       (must add theme name option, default is tela)
+  -r, --remove                remove theme              [anto426|tela|vimix|stylish|whitesur] (must add theme name option, default is anto426)
 
   -b, --boot                  install theme into '/boot/grub' or '/boot/grub2'
   -g, --generate              do not install but generate theme into chosen directory       (must add your directory)
@@ -75,6 +75,45 @@ OPTIONS:
   -h, --help                  show this help
 
 EOF
+}
+
+theme_config_path() {
+  local theme="${1}"
+  local screen="${2}"
+  local themed_config="${REO_DIR}/config/theme-${theme}-${screen}.txt"
+  local default_config="${REO_DIR}/config/theme-${screen}.txt"
+
+  if [[ -f "${themed_config}" ]]; then
+    printf '%s\n' "${themed_config}"
+  else
+    printf '%s\n' "${default_config}"
+  fi
+}
+
+theme_background_path() {
+  local theme="${1}"
+  local screen="${2}"
+  local themed_background="${REO_DIR}/backgrounds/${screen}/background-${theme}.jpg"
+  local fallback_background="${REO_DIR}/backgrounds/${screen}/background-tela.jpg"
+
+  if [[ -f "${themed_background}" ]]; then
+    printf '%s\n' "${themed_background}"
+  else
+    printf '%s\n' "${fallback_background}"
+  fi
+}
+
+select_asset_path() {
+  local theme="${1}"
+  local screen="${2}"
+  local themed_select="${REO_DIR}/assets/assets-select-${theme}/select-${screen}"
+  local default_select="${REO_DIR}/assets/assets-select/select-${screen}"
+
+  if [[ -d "${themed_select}" ]]; then
+    printf '%s\n' "${themed_select}"
+  else
+    printf '%s\n' "${default_select}"
+  fi
 }
 
 generate() {
@@ -98,8 +137,8 @@ generate() {
 
   # Don't preserve ownership because the owner will be root, and that causes the script to crash if it is ran from terminal by sudo
   cp -a --no-preserve=ownership "${REO_DIR}/common/"*.pf2 "${THEME_DIR}/${theme}"
-  cp -a --no-preserve=ownership "${REO_DIR}/config/theme-${screen}.txt" "${THEME_DIR}/${theme}/theme.txt"
-  cp -a --no-preserve=ownership "${REO_DIR}/backgrounds/${screen}/background-${theme}.jpg" "${THEME_DIR}/${theme}/background.jpg"
+  cp -a --no-preserve=ownership "$(theme_config_path "${theme}" "${screen}")" "${THEME_DIR}/${theme}/theme.txt"
+  cp -a --no-preserve=ownership "$(theme_background_path "${theme}" "${screen}")" "${THEME_DIR}/${theme}/background.jpg"
 
   # Function to determine which assets to use based on resolution
   get_asset_type() {
@@ -122,15 +161,15 @@ generate() {
       install_depends ImageMagick
     fi
     asset_type=$(get_asset_type "$custom_resolution")
-    cp -a --no-preserve=ownership "${REO_DIR}/config/theme-${asset_type}.txt" "${THEME_DIR}/${theme}/theme.txt"
+    cp -a --no-preserve=ownership "$(theme_config_path "${theme}" "${asset_type}")" "${THEME_DIR}/${theme}/theme.txt"
     # Replace resolution in theme.txt
     sed -i "s/[0-9]\+x[0-9]\+/${custom_resolution}/" "${THEME_DIR}/${theme}/theme.txt"
     # Use appropriate background as base and resize it
-    cp -a --no-preserve=ownership "${REO_DIR}/backgrounds/${asset_type}/background-${theme}.jpg" "${THEME_DIR}/${theme}/background.jpg"
+    cp -a --no-preserve=ownership "$(theme_background_path "${theme}" "${asset_type}")" "${THEME_DIR}/${theme}/background.jpg"
     magick "${THEME_DIR}/${theme}/background.jpg" -resize ${custom_resolution}^ -gravity center -extent ${custom_resolution} "${THEME_DIR}/${theme}/background.jpg"
   else
-    cp -a --no-preserve=ownership "${REO_DIR}/config/theme-${screen}.txt" "${THEME_DIR}/${theme}/theme.txt"
-    cp -a --no-preserve=ownership "${REO_DIR}/backgrounds/${screen}/background-${theme}.jpg" "${THEME_DIR}/${theme}/background.jpg"
+    cp -a --no-preserve=ownership "$(theme_config_path "${theme}" "${screen}")" "${THEME_DIR}/${theme}/theme.txt"
+    cp -a --no-preserve=ownership "$(theme_background_path "${theme}" "${screen}")" "${THEME_DIR}/${theme}/background.jpg"
   fi
 
   # Use custom background.jpg as grub background image
@@ -149,19 +188,19 @@ generate() {
   if [[ -n "$custom_resolution" ]]; then
     asset_type=$(get_asset_type "$custom_resolution")
     cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-${icon}/icons-${asset_type}" "${THEME_DIR}/${theme}/icons"
-    cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-select/select-${asset_type}/"*.png "${THEME_DIR}/${theme}"
+    cp -a --no-preserve=ownership "$(select_asset_path "${theme}" "${asset_type}")/"*.png "${THEME_DIR}/${theme}"
     cp -a --no-preserve=ownership "${REO_DIR}/assets/info-${asset_type}.png" "${THEME_DIR}/${theme}/info.png"
   elif [[ ${screen} == 'ultrawide' ]]; then
     cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-${icon}/icons-1080p" "${THEME_DIR}/${theme}/icons"
-    cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-select/select-1080p/"*.png "${THEME_DIR}/${theme}"
+    cp -a --no-preserve=ownership "$(select_asset_path "${theme}" "1080p")/"*.png "${THEME_DIR}/${theme}"
     cp -a --no-preserve=ownership "${REO_DIR}/assets/info-1080p.png" "${THEME_DIR}/${theme}/info.png"
   elif [[ ${screen} == 'ultrawide2k' ]]; then
     cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-${icon}/icons-2k" "${THEME_DIR}/${theme}/icons"
-    cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-select/select-2k/"*.png "${THEME_DIR}/${theme}"
+    cp -a --no-preserve=ownership "$(select_asset_path "${theme}" "2k")/"*.png "${THEME_DIR}/${theme}"
     cp -a --no-preserve=ownership "${REO_DIR}/assets/info-2k.png" "${THEME_DIR}/${theme}/info.png"
   else
     cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-${icon}/icons-${screen}" "${THEME_DIR}/${theme}/icons"
-    cp -a --no-preserve=ownership "${REO_DIR}/assets/assets-select/select-${screen}/"*.png "${THEME_DIR}/${theme}"
+    cp -a --no-preserve=ownership "$(select_asset_path "${theme}" "${screen}")/"*.png "${THEME_DIR}/${theme}"
     cp -a --no-preserve=ownership "${REO_DIR}/assets/info-${screen}.png" "${THEME_DIR}/${theme}/info.png"
   fi
 }
@@ -359,16 +398,18 @@ run_dialog() {
     fi
 
     tui=$(dialog --backtitle ${Project_Name} \
-    --radiolist "Choose your Grub theme background picture : " 15 40 5 \
-      1 "Vimix Theme" off  \
-      2 "Tela Theme" on \
-      3 "Stylish Theme" off  \
-      4 "WhiteSur Theme" off --output-fd 1 )
+    --radiolist "Choose your Grub theme background picture : " 15 44 6 \
+      1 "Anto426 Theme" on \
+      2 "Vimix Theme" off  \
+      3 "Tela Theme" off \
+      4 "Stylish Theme" off  \
+      5 "WhiteSur Theme" off --output-fd 1 )
       case "$tui" in
-        1) theme="vimix"      ;;
-        2) theme="tela"       ;;
-        3) theme="stylish"    ;;
-        4) theme="whitesur"   ;;
+        1) theme="anto426"    ;;
+        2) theme="vimix"      ;;
+        3) theme="tela"       ;;
+        4) theme="stylish"    ;;
+        5) theme="whitesur"   ;;
         *) operation_canceled ;;
      esac
 
@@ -596,20 +637,24 @@ while [[ $# -gt 0 ]]; do
       shift
       for theme in "${@}"; do
         case "${theme}" in
-          tela)
+          anto426)
             themes+=("${THEME_VARIANTS[0]}")
             shift
             ;;
-          vimix)
+          tela)
             themes+=("${THEME_VARIANTS[1]}")
             shift
             ;;
-          stylish)
+          vimix)
             themes+=("${THEME_VARIANTS[2]}")
             shift
             ;;
-          whitesur)
+          stylish)
             themes+=("${THEME_VARIANTS[3]}")
+            shift
+            ;;
+          whitesur)
+            themes+=("${THEME_VARIANTS[4]}")
             shift
             ;;
           -*)
@@ -637,20 +682,24 @@ while [[ $# -gt 0 ]]; do
       shift
       for theme in "${@}"; do
         case "${theme}" in
-          tela)
+          anto426)
             themes+=("${THEME_VARIANTS[0]}")
             shift
             ;;
-          vimix)
+          tela)
             themes+=("${THEME_VARIANTS[1]}")
             shift
             ;;
-          stylish)
+          vimix)
             themes+=("${THEME_VARIANTS[2]}")
             shift
             ;;
-          whitesur)
+          stylish)
             themes+=("${THEME_VARIANTS[3]}")
+            shift
+            ;;
+          whitesur)
+            themes+=("${THEME_VARIANTS[4]}")
             shift
             ;;
           -*)
