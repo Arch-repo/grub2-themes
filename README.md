@@ -1,8 +1,8 @@
 # Anto426 GRUB Theme
 
-GRUB2 theme fork based on [`vinceliuice/grub2-themes`](https://github.com/vinceliuice/grub2-themes), tuned for the Anto426 Hyprland setup.
+Single active GRUB2 theme tuned for the Anto426 Hyprland setup.
 
-The default variant is `anto426`: it uses the Anto426 wallpaper set, warm selection assets, and a dedicated GRUB layout. The upstream variants remain available as fallbacks.
+`anto426` is the only theme exposed by the installer. It uses the Riva/Anto426 palette, a centered control-style boot menu, color icons, and dedicated layouts for 1080p, 2k, 4k, and ultrawide displays.
 
 ## Install
 
@@ -37,8 +37,8 @@ sudo ./install.sh [OPTIONS...]
 Options:
 
 ```text
-  -t, --theme                 theme variant(s)          [anto426|tela|vimix|stylish|whitesur]
-  -i, --icon                  icon variant(s)           [color|white|whitesur]
+  -t, --theme                 theme variant             [anto426]
+  -i, --icon                  icon variant              [color]
   -s, --screen                screen display variant(s) [1080p|2k|4k|ultrawide|ultrawide2k]
   -c, --custom-resolution     set custom resolution     (e.g. 1600x900)
   -r, --remove                remove theme
@@ -60,4 +60,4 @@ sudo ./install.sh -r -t anto426
 
 ## Credits
 
-Original GRUB theme project by [vinceliuice](https://github.com/vinceliuice/grub2-themes). This fork keeps upstream compatibility while adding the Anto426 defaults.
+Original GRUB theme project by [vinceliuice](https://github.com/vinceliuice/grub2-themes). This fork keeps the installer shape but exposes only the Anto426/Riva theme.

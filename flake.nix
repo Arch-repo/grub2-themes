@@ -17,6 +17,8 @@
       nixosModules.default = { config, ... }:
         let
           cfg = config.boot.loader.grub2-theme;
+          themeName = "anto426";
+          iconName = "color";
           splashImage = if cfg.splashImage == null then "" else cfg.splashImage;
           hasBootMenuConfig = cfg.bootMenuConfig != null;
           hasTerminalConfig = cfg.terminalConfig != null;
@@ -44,22 +46,22 @@
               bash ./install.sh \
                 --generate $out/grub/themes \
                 --screen ${cfg.screen} \
-                --theme ${cfg.theme} \
-                --icon ${cfg.icon} \
+                --theme ${themeName} \
+                --icon ${iconName} \
                 ${if cfg.customResolution != null then "--custom-resolution ${cfg.customResolution}" else ""}
 
               if [ -n "${splashImage}" ]; then
-                rm $out/grub/themes/${cfg.theme}/background.jpg;
-                ${pkgs.imagemagick}/bin/magick ${splashImage} $out/grub/themes/${cfg.theme}/background.jpg;
+                rm $out/grub/themes/${themeName}/background.jpg;
+                ${pkgs.imagemagick}/bin/magick ${splashImage} $out/grub/themes/${themeName}/background.jpg;
               fi;
 
               if [ ${pkgs.lib.trivial.boolToString cfg.footer} == "false" ]; then
-                sed -i ':again;$!N;$!b again; s/\+ image {[^}]*}//g' $out/grub/themes/${cfg.theme}/theme.txt;
+                sed -i ':again;$!N;$!b again; s/\+ image {[^}]*}//g' $out/grub/themes/${themeName}/theme.txt;
               fi;
 
               if [ ${pkgs.lib.trivial.boolToString hasBootMenuConfig} == "true" ]; then
-                sed -i ':again;$!N;$!b again; s/\+ boot_menu {[^}]*}//g' $out/grub/themes/${cfg.theme}/theme.txt;
-                cat << EOF >> $out/grub/themes/${cfg.theme}/theme.txt
+                sed -i ':again;$!N;$!b again; s/\+ boot_menu {[^}]*}//g' $out/grub/themes/${themeName}/theme.txt;
+                cat << EOF >> $out/grub/themes/${themeName}/theme.txt
               + boot_menu {
                   ${if cfg.bootMenuConfig == null then "" else cfg.bootMenuConfig}
               }
@@ -67,8 +69,8 @@
               fi;
 
               if [ ${pkgs.lib.trivial.boolToString hasTerminalConfig} == "true" ]; then
-                sed -i 's/^terminal-.*$//g' $out/grub/themes/${cfg.theme}/theme.txt
-                cat << EOF >> $out/grub/themes/${cfg.theme}/theme.txt
+                sed -i 's/^terminal-.*$//g' $out/grub/themes/${themeName}/theme.txt
+                cat << EOF >> $out/grub/themes/${themeName}/theme.txt
               ${if cfg.terminalConfig == null then "" else cfg.terminalConfig}
               EOF
               fi;
@@ -87,22 +89,6 @@
                 type = types.bool;
                 description = ''
                   Enable grub2 theming
-                '';
-              };
-              theme = mkOption {
-                default = "anto426";
-                example = "anto426";
-                type = types.enum [ "anto426" "tela" "vimix" "stylish" "whitesur" ];
-                description = ''
-                  The theme to use for grub2.
-                '';
-              };
-              icon = mkOption {
-                default = "white";
-                example = "white";
-                type = types.enum [ "color" "white" "whitesur" ];
-                description = ''
-                  The icon to use for grub2.
                 '';
               };
               screen = mkOption {
@@ -163,8 +149,8 @@
               grub2-theme
             ];
             boot.loader.grub = {
-              theme = "${grub2-theme}/grub/themes/${cfg.theme}";
-              splashImage = "${grub2-theme}/grub/themes/${cfg.theme}/background.jpg";
+              theme = "${grub2-theme}/grub/themes/${themeName}";
+              splashImage = "${grub2-theme}/grub/themes/${themeName}/background.jpg";
               gfxmodeEfi = "${resolution},auto";
               gfxmodeBios = "${resolution},auto";
               extraConfig = ''

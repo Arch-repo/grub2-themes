@@ -11,8 +11,8 @@ tui_root_login=
 THEME_DIR="/usr/share/grub/themes"
 REO_DIR="$(cd $(dirname $0) && pwd)"
 
-THEME_VARIANTS=('anto426' 'tela' 'vimix' 'stylish' 'whitesur')
-ICON_VARIANTS=('color' 'white' 'whitesur')
+THEME_VARIANTS=('anto426')
+ICON_VARIANTS=('color')
 SCREEN_VARIANTS=('1080p' '2k' '4k' 'ultrawide' 'ultrawide2k')
 custom_resolution=""
 
@@ -63,11 +63,11 @@ cat << EOF
 Usage: $0 [OPTION]...
 
 OPTIONS:
-  -t, --theme                 theme variant(s)          [anto426|tela|vimix|stylish|whitesur] (default is anto426)
-  -i, --icon                  icon variant(s)           [color|white|whitesur]              (default is color)
+  -t, --theme                 theme variant             [anto426]                            (default is anto426)
+  -i, --icon                  icon variant              [color]                              (default is color)
   -s, --screen                screen display variant(s) [1080p|2k|4k|ultrawide|ultrawide2k] (default is 1080p)
   -c, --custom-resolution     set custom resolution     (e.g., 1600x900)                    (disabled in default)
-  -r, --remove                remove theme              [anto426|tela|vimix|stylish|whitesur] (must add theme name option, default is anto426)
+  -r, --remove                remove theme              [anto426]                            (default is anto426)
 
   -b, --boot                  install theme into '/boot/grub' or '/boot/grub2'
   -g, --generate              do not install but generate theme into chosen directory       (must add your directory)
@@ -80,40 +80,19 @@ EOF
 theme_config_path() {
   local theme="${1}"
   local screen="${2}"
-  local themed_config="${REO_DIR}/config/theme-${theme}-${screen}.txt"
-  local default_config="${REO_DIR}/config/theme-${screen}.txt"
-
-  if [[ -f "${themed_config}" ]]; then
-    printf '%s\n' "${themed_config}"
-  else
-    printf '%s\n' "${default_config}"
-  fi
+  printf '%s\n' "${REO_DIR}/config/theme-${theme}-${screen}.txt"
 }
 
 theme_background_path() {
   local theme="${1}"
   local screen="${2}"
-  local themed_background="${REO_DIR}/backgrounds/${screen}/background-${theme}.jpg"
-  local fallback_background="${REO_DIR}/backgrounds/${screen}/background-tela.jpg"
-
-  if [[ -f "${themed_background}" ]]; then
-    printf '%s\n' "${themed_background}"
-  else
-    printf '%s\n' "${fallback_background}"
-  fi
+  printf '%s\n' "${REO_DIR}/backgrounds/${screen}/background-${theme}.jpg"
 }
 
 select_asset_path() {
   local theme="${1}"
   local screen="${2}"
-  local themed_select="${REO_DIR}/assets/assets-select-${theme}/select-${screen}"
-  local default_select="${REO_DIR}/assets/assets-select/select-${screen}"
-
-  if [[ -d "${themed_select}" ]]; then
-    printf '%s\n' "${themed_select}"
-  else
-    printf '%s\n' "${default_select}"
-  fi
+  printf '%s\n' "${REO_DIR}/assets/assets-select-${theme}/select-${screen}"
 }
 
 generate() {
@@ -397,33 +376,8 @@ run_dialog() {
       fi
     fi
 
-    tui=$(dialog --backtitle ${Project_Name} \
-    --radiolist "Choose your Grub theme background picture : " 15 44 6 \
-      1 "Anto426 Theme" on \
-      2 "Vimix Theme" off  \
-      3 "Tela Theme" off \
-      4 "Stylish Theme" off  \
-      5 "WhiteSur Theme" off --output-fd 1 )
-      case "$tui" in
-        1) theme="anto426"    ;;
-        2) theme="vimix"      ;;
-        3) theme="tela"       ;;
-        4) theme="stylish"    ;;
-        5) theme="whitesur"   ;;
-        *) operation_canceled ;;
-     esac
-
-    tui=$(dialog --backtitle ${Project_Name} \
-    --radiolist "Choose icon style : " 15 40 5 \
-      1 "white" off \
-      2 "color" on \
-      3 "whitesur" off --output-fd 1 )
-      case "$tui" in
-        1) icon="white"       ;;
-        2) icon="color"       ;;
-        3) icon="whitesur"    ;;
-        *) operation_canceled ;;
-     esac
+    theme="${THEME_VARIANTS[0]}"
+    icon="${ICON_VARIANTS[0]}"
 
     tui=$(dialog --backtitle ${Project_Name} \
     --radiolist "Choose your Display Resolution : " 15 40 5 \
@@ -641,22 +595,6 @@ while [[ $# -gt 0 ]]; do
             themes+=("${THEME_VARIANTS[0]}")
             shift
             ;;
-          tela)
-            themes+=("${THEME_VARIANTS[1]}")
-            shift
-            ;;
-          vimix)
-            themes+=("${THEME_VARIANTS[2]}")
-            shift
-            ;;
-          stylish)
-            themes+=("${THEME_VARIANTS[3]}")
-            shift
-            ;;
-          whitesur)
-            themes+=("${THEME_VARIANTS[4]}")
-            shift
-            ;;
           -*)
             break
             ;;
@@ -686,22 +624,6 @@ while [[ $# -gt 0 ]]; do
             themes+=("${THEME_VARIANTS[0]}")
             shift
             ;;
-          tela)
-            themes+=("${THEME_VARIANTS[1]}")
-            shift
-            ;;
-          vimix)
-            themes+=("${THEME_VARIANTS[2]}")
-            shift
-            ;;
-          stylish)
-            themes+=("${THEME_VARIANTS[3]}")
-            shift
-            ;;
-          whitesur)
-            themes+=("${THEME_VARIANTS[4]}")
-            shift
-            ;;
           -*)
             break
             ;;
@@ -719,14 +641,6 @@ while [[ $# -gt 0 ]]; do
         case "${icon}" in
           color)
             icons+=("${ICON_VARIANTS[0]}")
-            shift
-            ;;
-          white)
-            icons+=("${ICON_VARIANTS[1]}")
-            shift
-            ;;
-          whitesur)
-            icons+=("${ICON_VARIANTS[2]}")
             shift
             ;;
           -*)

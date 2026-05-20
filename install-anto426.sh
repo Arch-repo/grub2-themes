@@ -3,7 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-args=(-t anto426 -i "${ANTO426_GRUB_ICON:-color}")
+args=(-t anto426 -i color)
 
 if [[ -n "${ANTO426_GRUB_RESOLUTION:-}" ]]; then
     args+=(-c "$ANTO426_GRUB_RESOLUTION")
@@ -16,4 +16,3 @@ if [[ "${ANTO426_GRUB_BOOT:-0}" == "1" ]]; then
 fi
 
 exec "$script_dir/install.sh" "${args[@]}" "$@"
-
