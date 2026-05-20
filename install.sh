@@ -30,6 +30,23 @@ b_CCIN=" \033[1;36m"                                # bold info color
 b_CGSC=" \033[1;32m"                                # bold success color
 b_CRER=" \033[1;31m"                                # bold error color
 b_CWAR=" \033[1;33m"                                # bold warning color
+UI_RESET="\033[0m"
+UI_BOLD="\033[1m"
+UI_DIM="\033[2m"
+UI_PINK="\033[35m"
+UI_YELLOW="\033[33m"
+UI_GREEN="\033[32m"
+UI_BLUE="\033[34m"
+
+ui_line() {
+  printf '%b\n' "${UI_PINK}---------------------------------------------------------------------${UI_RESET}"
+}
+
+ui_banner() {
+  printf '\n%b\n' "${UI_PINK}${UI_BOLD}  ANTO426 GRUB THEME${UI_RESET}"
+  printf '%b\n' "${UI_DIM}  Installs or generates the matching GRUB boot theme.${UI_RESET}"
+  ui_line
+}
 
 #######################################
 #   :::::: F U N C T I O N S ::::::   #
@@ -37,17 +54,20 @@ b_CWAR=" \033[1;33m"                                # bold warning color
 
 # echo like ... with flag type and display message colors
 prompt () {
-  case ${1} in
+  local level="${1:-}"
+  shift || true
+
+  case ${level} in
     "-s"|"--success")
-      echo -e "${b_CGSC}${@/-s/}${CDEF}";;    # print success message
+      printf '%b[OK]%b %b\n' "$UI_GREEN" "$UI_RESET" "$*";;    # print success message
     "-e"|"--error")
-      echo -e "${b_CRER}${@/-e/}${CDEF}";;    # print error message
+      printf '%b[ERROR]%b %b\n' "$UI_YELLOW" "$UI_RESET" "$*";;    # print error message
     "-w"|"--warning")
-      echo -e "${b_CWAR}${@/-w/}${CDEF}";;    # print warning message
+      printf '%b[WARN]%b %b\n' "$UI_YELLOW" "$UI_RESET" "$*";;    # print warning message
     "-i"|"--info")
-      echo -e "${b_CCIN}${@/-i/}${CDEF}";;    # print info message
+      printf '%b[NOTE]%b %b\n' "$UI_BLUE" "$UI_RESET" "$*";;    # print info message
     *)
-    echo -e "$@"
+    printf '%b\n' "${level}${*:+ $*}"
     ;;
   esac
 }
@@ -55,6 +75,39 @@ prompt () {
 # Check command availability
 function has_command() {
   command -v $1 &> /dev/null #with "&>", all output will be redirected.
+}
+
+no_new_privileges_enabled() {
+  [[ -r /proc/self/status ]] && awk '$1 == "NoNewPrivs:" && $2 == "1" { found = 1 } END { exit found ? 0 : 1 }' /proc/self/status
+}
+
+root_install_hint() {
+  prompt -i "GRUB install needs real root because it writes /usr/share/grub and /etc/default/grub."
+  prompt -i "Open a normal terminal outside sandbox/Flatpak/container restrictions and run:"
+  prompt -i "  sudo bash ./install-anto426.sh"
+  prompt -i "Preview without root:"
+  prompt -i "  bash ./install-anto426.sh --generate \"\$HOME/.cache/anto426-grub-theme\""
+}
+
+run_as_root() {
+  if (( UID == ROOT_UID )); then
+    return 0
+  fi
+
+  if no_new_privileges_enabled; then
+    prompt -e "This shell has no_new_privileges enabled, so sudo cannot become root here."
+    root_install_hint
+    exit 1
+  fi
+
+  if ! has_command sudo; then
+    prompt -e "sudo is not installed or not available."
+    root_install_hint
+    exit 1
+  fi
+
+  prompt -i "Root privileges required; re-running with sudo."
+  exec sudo -- "$0" "$@"
 }
 
 usage() {
@@ -189,8 +242,19 @@ install() {
   local icon=${2}
   local screen=${3}
 
-  # Check for root access and proceed if it is present
-  if [[ "$UID" -eq "$ROOT_UID" ]]; then
+  if [[ "$UID" -ne "$ROOT_UID" ]]; then
+    local args=(-t "$theme" -i "$icon")
+
+    if [[ -n "$custom_resolution" ]]; then
+      args+=(-c "$custom_resolution")
+    else
+      args+=(-s "$screen")
+    fi
+
+    [[ "${install_boot}" == 'true' ]] && args+=(-b)
+    run_as_root "${args[@]}"
+  fi
+
     # Generate the theme in "/usr/share/grub/themes"
     generate "${theme}" "${icon}" "${screen}"
 
@@ -289,64 +353,6 @@ install() {
     prompt -i "\n Updating grub config... \n"
     updating_grub
     prompt -w "\n * At the next restart of your computer you will see your new Grub theme: '$theme' \n"
-
-  #Check if password is cached (if cache timestamp has not expired yet)
-  elif sudo -n true 2> /dev/null && echo; then
-    if [[ -n "$custom_resolution" ]]; then
-      if [[ "${install_boot}" == 'true' ]]; then
-        sudo "$0" -t ${theme} -i ${icon} -c ${custom_resolution} -b
-      else
-        sudo "$0" -t ${theme} -i ${icon} -c ${custom_resolution}
-      fi
-    else
-      if [[ "${install_boot}" == 'true' ]]; then
-        sudo "$0" -t ${theme} -i ${icon} -s ${screen} -b
-      else
-        sudo "$0" -t ${theme} -i ${icon} -s ${screen}
-      fi
-    fi
-  else
-    #Ask for password
-    if [[ -n ${tui_root_login} ]] ; then
-      if [[ -n "${theme}" && -n "${screen}" ]]; then
-        if [[ "${install_boot}" == 'true' ]]; then
-          sudo -S $0 -t ${theme} -i ${icon} -s ${screen} -b <<< ${tui_root_login}
-        else
-          sudo -S $0 -t ${theme} -i ${icon} -s ${screen} <<< ${tui_root_login}
-        fi
-      elif [[ -n "$custom_resolution" ]]; then
-        if [[ "${install_boot}" == 'true' ]]; then
-          sudo -S $0 -t ${theme} -i ${icon} -c ${custom_resolution} -b <<< ${tui_root_login}
-        else
-          sudo -S $0 -t ${theme} -i ${icon} -c ${custom_resolution} <<< ${tui_root_login}
-        fi
-      fi
-    else
-      prompt -e "\n [ Error! ] -> Run me as root! "
-      read -r -p " [ Trusted ] Specify the root password : " -t ${MAX_DELAY} -s
-      if sudo -S echo <<< $REPLY 2> /dev/null && echo; then
-        #Correct password, use with sudo's stdin
-        if [[ -n "$custom_resolution" ]]; then
-          if [[ "${install_boot}" == 'true' ]]; then
-            sudo "$0" -t ${theme} -i ${icon} -c ${custom_resolution} -b <<< ${REPLY}
-          else
-            sudo "$0" -t ${theme} -i ${icon} -c ${custom_resolution} <<< ${REPLY}
-          fi
-        else
-          if [[ "${install_boot}" == 'true' ]]; then
-            sudo "$0" -t ${theme} -i ${icon} -s ${screen} -b <<< ${REPLY}
-          else
-            sudo "$0" -t ${theme} -i ${icon} -s ${screen} <<< ${REPLY}
-          fi
-        fi
-      else
-        #block for 3 seconds before allowing another attempt
-        sleep 3
-        prompt -e "\n [ Error! ] -> Incorrect password!\n"
-        exit 1
-      fi
-    fi
-  fi
 }
 
 run_dialog() {
@@ -370,7 +376,7 @@ run_dialog() {
         else
           #block for 3 seconds before allowing another attempt
           sleep 3
-          prompt -e "\n [ Error! ] -> Incorrect password!\n"
+          prompt -e "Incorrect password."
           exit 1
         fi
       fi
@@ -523,25 +529,7 @@ remove() {
       exit 1
     fi
   else
-    #Check if password is cached (if cache timestamp not expired yet)
-    if sudo -n true 2> /dev/null && echo; then
-      #No need to ask for password
-      sudo "$0" -t ${theme} "${PROG_ARGS[@]}"
-    else
-      #Ask for password
-      prompt -e "\n [ Error! ] -> Run me as root! "
-      read -r -p " [ Trusted ] Specify the root password : " -t ${MAX_DELAY} -s #when using "read" command, "-r" option must be supplied ==> https://github.com/koalaman/shellcheck/wiki/SC2162
-
-      if sudo -S echo <<< $REPLY 2> /dev/null && echo; then
-        #Correct password, use with sudo's stdin
-        sudo -S "$0" -t ${theme} "${PROG_ARGS[@]}" <<< $REPLY
-      else
-        #block for 3 seconds before allowing another attempt
-        sleep 3
-        prompt -e "\n [ Error! ] -> Incorrect password!\n"
-        exit 1
-      fi
-    fi
+    run_as_root -r -t "$theme"
   fi
 }
 
@@ -555,8 +543,8 @@ dialog_installer() {
         exec sudo $0
       else
         #Ask for password
-        prompt -e "\n [ Error! ] -> Run me as root! "
-        read -r -p " [ Trusted ] Specify the root password : " -t ${MAX_DELAY} -s
+        prompt -e "Root privileges required."
+        read -r -p "Root password: " -t ${MAX_DELAY} -s
 
         if sudo -S echo <<< $REPLY 2> /dev/null && echo; then
           #Correct password, use with sudo's stdin
@@ -564,7 +552,7 @@ dialog_installer() {
         else
           #block for 3 seconds before allowing another attempt
           sleep 3
-          prompt -e "\n [ Error! ] -> Incorrect password!\n"
+          prompt -e "Incorrect password."
           exit 1
         fi
       fi
@@ -709,6 +697,8 @@ done
 #############################
 #   :::::: M A I N ::::::   #
 #############################
+
+ui_banner
 
 # Show terminal user interface for better use
 if [[ "${dialog:-}" == 'false' ]]; then
