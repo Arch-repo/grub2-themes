@@ -1,28 +1,41 @@
-<div align="center">
+<p align="center">
+  <img 
+    src="https://wsrv.nl/?url=avatars.githubusercontent.com/u/87477585?v=5&w=300&h=300&mask=circle&fit=cover" 
+    width="150"
+  />
+</p>
 
-# 🗂️ anto426 grub2-themes
+<p align="center">
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=24&duration=3000&pause=1000&color=8cb8e4&center=true&vCenter=true&width=500&height=80&lines=Custom+GRUB+Theme;Aesthetic+Bootloader;Dynamic+Color+Boot" alt="Typing SVG" /></a>
+</p>
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=28&duration=3000&pause=1000&color=8cb8e4&center=true&vCenter=true&width=435&lines=Custom+GRUB+Theme;Aesthetic+Bootloader;Dynamic+Colors+Support)](https://git.io/typing-svg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
-A highly customized and fully responsive **GRUB2 Bootloader** theme tuned for the `anto426` Hyprland ecosystem.
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon.gif" width="60px" /> Features;
 
-</div>
+```sh
+root@anto426: ~/grub2-themes (main⚡)$ cat specs.txt
 
----
+A highly customized and responsive bootloader screen specializing in the premium 'anto426' layout.
 
-## ✨ Features
+- 🎨 Dynamic Colors: Rewritten on desktop wallpaper change to synchronize boot colors with home aesthetics.
+- 📐 Screen Presets: High quality visual layouts for 1080p, 2K, 4K, Ultrawide, and Ultrawide2K displays.
+- 🧩 Elegant Icons: Premium custom vector icon sets, elegant selectors, and clean branding boxes.
+```
 
-The `anto426` theme is the exclusive variant exposed by this installer. It is designed to look extremely premium and integrates seamlessly with the dynamic color theme engine.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
-- 🎨 **Dynamic Colors**: Sourced automatically from your active desktop wallpaper.
-- 📐 **Responsive Layouts**: Pre-configured screen assets and customized layouts for **1080p**, **2k**, **4k**, **ultrawide**, and **ultrawide2k** displays.
-- 🧩 **Branding & Assets**: Features custom icons, elegant selection pixmaps, stylized terminal widgets, and the custom branding `info.png` block.
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon2.gif" width="70px" /> Quick Install;
 
----
+```sh
+root@anto426: ~/grub2-themes (main⚡)$ sudo ./install-anto426.sh
 
-## 🚀 Quick Install
-
-To install the theme with the default 1080p layout and color icons:
+Deploy the theme with default 1080p layout and full color icons instantly:
+```
 
 ```bash
 sudo bash ./install-anto426.sh
@@ -30,75 +43,60 @@ sudo bash ./install-anto426.sh
 
 ---
 
-## ⚙️ Custom Configurations
+### ⚙️ Environmental Customization
 
-You can customize the installation using environment variables before running the script:
+You can control assets compilation and installation paths via variables:
 
-### 📺 Change Screen Preset
-Override the display configuration for high-resolution monitors:
-```bash
-sudo ANTO426_GRUB_SCREEN=2k bash ./install-anto426.sh
+- **High DPI Screen Preset**:
+  ```bash
+  sudo ANTO426_GRUB_SCREEN=2k bash ./install-anto426.sh
+  ```
+- **Custom Display Resolutions**:
+  ```bash
+  sudo ANTO426_GRUB_RESOLUTION=1600x900 bash ./install-anto426.sh
+  ```
+- **Direct `/boot` Folder Installation**:
+  ```bash
+  sudo ANTO426_GRUB_BOOT=1 bash ./install-anto426.sh
+  ```
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
+
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon3.gif" width="70px" /> Advanced Options;
+
+```sh
+root@anto426: ~/grub2-themes (main⚡)$ ./install.sh --help
 ```
 
-### 📏 Use Custom Resolution
-If your native display is not listed, specify a custom resolution directly (automatically resizes and formats assets via ImageMagick):
-```bash
-sudo ANTO426_GRUB_RESOLUTION=1600x900 bash ./install-anto426.sh
+| Command Options | Values | Rationale |
+|---|---|---|
+| `-t, --theme` | `anto426` | Select custom profile theme style (locked default). |
+| `-i, --icon` | `color` | Icon style asset packages. |
+| `-s, --screen` | `1080p\|2k\|4k\|ultrawide\|ultrawide2k` | Screen display preset target. |
+| `-c, --custom-resolution` | `WIDTHxHEIGHT` | Forces ImageMagick assets resizing to resolution. |
+| `-r, --remove` | `anto426` | Removes boot theme modifications and restores backups. |
+| `-b, --boot` | *(None)* | Installs directly into EFI system directory `/boot/grub`. |
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
+
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon4.gif" width="70px" /> Integration & Credits;
+
+```sh
+root@anto426: ~/grub2-themes (main⚡)$ neofetch --view origin
+
+- Upstream Project: vinceliuice/grub2-themes installer logic base.
+- Dynamic color integration is handled by the dotfiles colors engine during wallpaper edits:
+  - Generates '/usr/share/grub/themes/anto426/background.jpg'
+  - Alters 'theme.txt' fonts, color selectors, and layouts to match.
 ```
 
-### 💾 Install to Boot Directory
-To install directly into `/boot/grub/themes` or `/boot/grub2/themes` (useful for EFI installations):
-```bash
-sudo ANTO426_GRUB_BOOT=1 bash ./install-anto426.sh
-```
-
----
-
-## 🛠️ Advanced Usage
-
-For full control, run the core installer script directly:
-
-```bash
-sudo ./install.sh [OPTIONS...]
-```
-
-| Option | Argument | Description |
-|--------|----------|-------------|
-| `-t, --theme` | `anto426` | Theme variant (default is `anto426`) |
-| `-i, --icon` | `color` | Icon variant (default is `color`) |
-| `-s, --screen` | `1080p\|2k\|4k\|ultrawide\|ultrawide2k` | Screen display variant (default is `1080p`) |
-| `-c, --custom-resolution` | `WIDTHxHEIGHT` | Custom display resolution (e.g. `1600x900`) |
-| `-r, --remove` | `anto426` | Remove installed theme |
-| `-b, --boot` | *(None)* | Install theme into `/boot/grub` or `/boot/grub2` |
-| `-g, --generate` | `/path/to/dir` | Generate theme into chosen directory |
-
-### Examples
-```bash
-# Install for 2K screen
-sudo ./install.sh -t anto426 -s 2k
-
-# Install with custom resolution
-sudo ./install.sh -t anto426 -c 3440x1440
-
-# Remove the theme
-sudo ./install.sh -r -t anto426
-```
-
----
-
-## 🤝 Integration
-
-`Arch-Hyprland` clones this repository during system installation and runs `install-anto426.sh`. 
-
-The dotfiles wallpaper engine (`wallpaper_effects.sh`) then takes over to dynamically modify `/usr/share/grub/themes/anto426/background.jpg`, `theme.txt`, and selection pixmaps, making your boot menu follow the active wallpaper palette perfectly!
-
----
-
-## 🎨 Credits
-
-Original GRUB theme project created by [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes). This fork keeps the installer framework but specializes exclusively in exposing and adapting the premium `anto426` Riva controls theme.
-
----
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
 <div align="center">
   <i>Configured by anto426</i>
