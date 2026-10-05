@@ -1,66 +1,58 @@
-# Anto426/Riva GRUB2 gfxmenu theme
-
+# Generated from the Anto Desktop shared design tokens.
 title-text: ""
 desktop-image: "background.jpg"
-desktop-color: "#281f33"
+desktop-color: "#141820"
 terminal-font: "Terminus Regular 18"
-terminal-box: "terminal_box_*.png"
-terminal-width: "100%"
-terminal-height: "100%"
-terminal-border: "0"
-
 + label {
-  top = 11%
-  left = 0
-  width = 100%
+  left = 22%
+  top = 17%
+  width = 56%
   align = "center"
-  text = "anto426"
-  color = "#f6f7fb"
-  font = "Unifont Regular 32"
+  text = "Il tuo desktop"
+  font = "Unifont Regular 24"
+  color = "#edf1f8"
 }
-
 + label {
-  top = 18%
-  left = 0
-  width = 100%
+  left = 22%
+  top = 23%
+  width = 56%
   align = "center"
-  text = "Select a system"
-  color = "#b9c4d2"
+  text = "Scegli il sistema da avviare"
   font = "Unifont Regular 16"
+  color = "#edf1f8"
 }
-
 + boot_menu {
-  left = 24%
-  top = 31%
-  width = 52%
-  height = 34%
+  left = 22%
+  top = 33%
+  width = 56%
+  height = 36%
   item_font = "Unifont Regular 24"
-  item_color = "#b9c4d2"
-  selected_item_color = "#f6f7fb"
+  item_color = "#edf1f8"
+  selected_item_color = "#edf1f8"
   icon_width = 40
   icon_height = 40
-  item_icon_space = 20
-  item_height = 54
-  item_padding = 12
+  item_icon_space = 16
+  item_height = 56
+  item_padding = 16
   item_spacing = 8
   selected_item_pixmap_style = "select_*.png"
 }
-
-+ image {
-  top = 100%-50
-  left = 50%-240
-  width = 480
-  height = 42
-  file = "info.png"
-}
-
 + label {
-  top = 86%
-  left = 24%
-  width = 52%
+  left = 22%
+  top = 75%
+  width = 56%
   align = "center"
   id = "__timeout__"
-  text = "Booting in %d seconds"
-  color = "#9579b6"
+  text = "Avvio automatico tra %d secondi"
   font = "Unifont Regular 16"
+  color = "#b4c8ff"
+}
++ label {
+  left = 22%
+  top = 81%
+  width = 56%
+  align = "center"
+  text = "Frecce: scegli   Invio: avvia   E: modifica   C: console"
+  font = "Unifont Regular 16"
+  color = "#edf1f8"
 }

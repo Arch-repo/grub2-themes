@@ -1,0 +1,6 @@
+{
+  "source_repository": "https://github.com/Arch-repo/dotfiles",
+  "tokens_sha256": "0ac04e9d0e63d19d79d3f8169fb2476f79158c42a135f0ecbc28859320e42364",
+  "renderer_sha256": "7ea5e7e2f2724bfbd419b0a33ea0decd9c092df4c9dfa66803b1999ec6853acc",
+  "regenerate": "python3 tools/update_design.py --dotfiles /path/to/dotfiles"
+}

@@ -95,3 +95,21 @@ root@anto426: ~/grub2-themes (main⚡)$ neofetch --view origin
 <div align="center">
   <i>Configured by anto426</i>
 </div>
+
+## Shared Anto Desktop layout
+
+The five resolution presets share the geometry and tokens of
+[Arch-repo/dotfiles](https://github.com/Arch-repo/dotfiles). The title, boot list,
+countdown and keyboard hint use one centred composition. Selection uses all nine
+slices, so corners remain rounded at every row width and height. Missing
+`terminal_box_*.png` references and the separate baked hint image were removed.
+
+Regenerate the committed presets with an explicitly chosen dotfiles checkout:
+
+```sh
+python3 tools/update_design.py --dotfiles /path/to/dotfiles
+```
+
+`design-source.json` records the hashes of the canonical tokens and renderer.
+The dotfiles boot worker supplies the wallpaper, baked glass panel and palette
+at runtime. GRUB has a static boot framebuffer; its glass is pre-rendered.
